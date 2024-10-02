@@ -1,5 +1,3 @@
 streamlit==1.39.0
 openai==0.28.1
 gtts
-pydub
-ffmpeg-python
