@@ -5,21 +5,21 @@ from io import BytesIO
 
 st.session_stateを使いメッセージのやりとりを保存
 if "messages" not in st.session_state:
-st.session_state["messages"] = [
-{"role": "system", "content": system_prompt}
-]
+  st.session_state["messages"] = [
+  {"role": "system", "content": system_prompt}
+  ]
 
 # チャットボットとやりとりする関数
 def communicate():
-messages = st.session_state["messages"]
-
-user_message = {"role": "user", "content": st.session_state["user_input"]}
-messages.append(user_message)
-
-response = openai. ChatCompletion.create(
-model="gpt-3.5-turbo",
-messages=messages
-)
+  messages = st.session_state["messages"]
+  
+  user_message = {"role": "user", "content": st.session_state["user_input"]}
+  messages.append(user_message)
+  
+  response = openai. ChatCompletion.create(
+  model="gpt-3.5-turbo",
+  messages=messages
+  )
 
 bot_message = response["choices"][0]["message"]
 messages.append(bot_message)
@@ -43,16 +43,16 @@ st.write("悩み事は何ですか？")
 user_input = st.text_input("悩み事を下に入力してください。", key="user_input", on_change=communicate)
 
 if st.session_state["messages"]:
-messages = st.session_state["messages"]
+  messages = st.session_state["messages"]
 
 for message in reversed(messages[1:]): # 直近のメッセージを上に
-speaker = "🙂"
+  speaker = "🙂"
 if message["role"] == "assistant":
-speaker = "🤖"
+  speaker = "🤖"
 
-st.write(speaker + ": " + message["content"])
+  st.write(speaker + ": " + message["content"])
 
 else:
-# パスワードが間違っている場合のメッセージを表示
-st.write("パスワードが正しくありません。アプリにアクセスするために正しいパスワードを入力してください。" )
+  # パスワードが間違っている場合のメッセージを表示
+  st.write("パスワードが正しくありません。アプリにアクセスするために正しいパスワードを入力してください。" )
 
