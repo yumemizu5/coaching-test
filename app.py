@@ -8,7 +8,7 @@ def generate_audio():
     try:
         tts = gTTS("これはテスト音声です", lang='ja')
         tts_file = BytesIO()
-        tts.save(tts_file)
+        tts.write_to_fp(tts_file)  # ここを修正
         tts_file.seek(0)  # ファイルポインタを先頭に戻す
         st.write(f"音声ファイルのサイズ: {len(tts_file.getvalue())} bytes")  # ファイルの長さを確認
         return tts_file
