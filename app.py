@@ -5,18 +5,23 @@ from io import BytesIO
 
 # gTTSでMP3を生成してBytesIOに保存する関数
 def generate_audio():
-    tts = gTTS("これはテスト音声です", lang='ja')
-    tts_file = BytesIO()
-    tts.save(tts_file)
-    tts_file.seek(0)  # ファイルポインタを先頭に戻す
-    st.write(f"音声ファイルのサイズ: {len(tts_file.getvalue())} bytes")  # ファイルの長さを確認
-    return tts_file
+    try:
+        tts = gTTS("これはテスト音声です", lang='ja')
+        tts_file = BytesIO()
+        tts.save(tts_file)
+        tts_file.seek(0)  # ファイルポインタを先頭に戻す
+        st.write(f"音声ファイルのサイズ: {len(tts_file.getvalue())} bytes")  # ファイルの長さを確認
+        return tts_file
+    except Exception as e:
+        st.error(f"音声生成に失敗しました: {e}")
+        return None
 
 st.title("Streamlit TTS Test")
 
 if st.button("Generate Test Audio"):
     audio_file = generate_audio()
-    st.audio(audio_file, format='audio/mp3')
+    if audio_file:
+        st.audio(audio_file, format='audio/mp3')
 
 
 # # パスワードを設定
