@@ -3,19 +3,19 @@ import openai
 from gtts import gTTS
 from io import BytesIO
 
-# Test text to speech conversion in Streamlit using MP3 format
-def generate_audio_mp3():
-    tts = gTTS("これはテストです", lang='ja')
+# gTTSでMP3を生成してBytesIOに保存する関数
+def generate_audio():
+    tts = gTTS("これはテスト音声です", lang='ja')
     tts_file = BytesIO()
     tts.save(tts_file)
-    tts_file.seek(0)
+    tts_file.seek(0)  # ファイルポインタを先頭に戻す
     return tts_file
 
-st.title("Streamlit TTS Test - MP3 Format")
+st.title("Streamlit TTS Test")
+
 if st.button("Generate Test Audio"):
-    audio_file = generate_audio_mp3()
-    audio_bytes = audio_file.read()  # Convert BytesIO to bytes
-    st.audio(audio_bytes, format='audio/mp3')
+    audio_file = generate_audio()
+    st.audio(audio_file, format='audio/mp3')
 
 
 # # パスワードを設定
