@@ -3,23 +3,19 @@ import openai
 from gtts import gTTS
 from io import BytesIO
 
-# Assuming you have an mp3 file named "sample.mp3" in the same directory
-audio_file_path = "sample.mp3"
+# Test text to speech conversion in Streamlit using MP3 format
+def generate_audio_mp3():
+    tts = gTTS("これはテストです", lang='ja')
+    tts_file = BytesIO()
+    tts.save(tts_file)
+    tts_file.seek(0)
+    return tts_file
 
-# Open and play a static audio file to test
-st.title("Test Static MP3 Playback")
-st.write("Testing with a pre-existing MP3 file.")
-
-try:
-    # Reading the file as binary
-    with open(audio_file_path, "rb") as audio_file:
-        audio_bytes = audio_file.read()
-
-    # Play the audio using Streamlit's audio player
-    st.audio(audio_bytes, format="audio/mp3")
-
-except FileNotFoundError:
-    st.error("MP3 file not found. Please upload or provide the correct path.")
+st.title("Streamlit TTS Test - MP3 Format")
+if st.button("Generate Test Audio"):
+    audio_file = generate_audio_mp3()
+    audio_bytes = audio_file.read()  # Convert BytesIO to bytes
+    st.audio(audio_bytes, format='audio/mp3')
 
 
 # # パスワードを設定
