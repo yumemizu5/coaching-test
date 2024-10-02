@@ -9,6 +9,7 @@ def generate_audio():
     tts_file = BytesIO()
     tts.save(tts_file)
     tts_file.seek(0)  # ファイルポインタを先頭に戻す
+    st.write(f"音声ファイルのサイズ: {len(tts_file.getvalue())} bytes")  # ファイルの長さを確認
     return tts_file
 
 st.title("Streamlit TTS Test")
