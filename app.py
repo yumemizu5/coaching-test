@@ -3,15 +3,18 @@ import openai
 from gtts import gTTS
 from io import BytesIO
 
-# Test text to speech conversion
-tts = gTTS("これはテストです", lang='ja')
-tts_file = BytesIO()
-tts.save(tts_file)
-tts_file.seek(0)
+# Test text to speech conversion in Streamlit
+def generate_audio():
+    tts = gTTS("これはテストです", lang='ja')
+    tts_file = BytesIO()
+    tts.save(tts_file)
+    tts_file.seek(0)
+    return tts_file
 
-with open("test_audio.mp3", "wb") as f:
-    f.write(tts_file.read())
-print("Audio file saved as test_audio.mp3")
+st.title("Streamlit TTS Test")
+if st.button("Generate Test Audio"):
+    audio_file = generate_audio()
+    st.audio(audio_file, format='audio/mp3')
 
 # # パスワードを設定
 # correct_password = st.secrets.mieai_pw.correct_password
