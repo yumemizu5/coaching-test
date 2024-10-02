@@ -3,18 +3,26 @@ import openai
 from gtts import gTTS
 from io import BytesIO
 
-# Test text to speech conversion in Streamlit
-def generate_audio():
+from pydub import AudioSegment
+
+# Test text to speech conversion in Streamlit using WAV format
+def generate_audio_wav():
     tts = gTTS("これはテストです", lang='ja')
     tts_file = BytesIO()
     tts.save(tts_file)
     tts_file.seek(0)
-    return tts_file
 
-st.title("Streamlit TTS Test")
+    # Convert MP3 to WAV using pydub
+    audio = AudioSegment.from_file(tts_file, format="mp3")
+    wav_io = BytesIO()
+    audio.export(wav_io, format="wav")
+    wav_io.seek(0)
+    return wav_io
+
+st.title("Streamlit TTS Test - WAV Format")
 if st.button("Generate Test Audio"):
-    audio_file = generate_audio()
-    st.audio(tts_file, format='audio/wav')
+    audio_file = generate_audio_wav()
+    st.audio(audio_file, format='audio/wav')
 
 # # パスワードを設定
 # correct_password = st.secrets.mieai_pw.correct_password
