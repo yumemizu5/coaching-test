@@ -14,7 +14,7 @@ def generate_audio():
 st.title("Streamlit TTS Test")
 if st.button("Generate Test Audio"):
     audio_file = generate_audio()
-    st.audio(audio_file, format='audio/mp3')
+    st.audio(tts_file, format='audio/wav')
 
 # # パスワードを設定
 # correct_password = st.secrets.mieai_pw.correct_password
