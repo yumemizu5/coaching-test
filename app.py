@@ -59,7 +59,7 @@ def communicate():
     tts_file.seek(0)
 
     # 音声再生
-    st.audio(tts_file)
+    st.audio(tts_file, format='audio/mp3')
 
 # ユーザーインターフェイスの構築
 st.title("「みえAi」コーチングボット")
