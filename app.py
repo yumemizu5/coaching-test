@@ -6,16 +6,16 @@ from gtts import gTTS
 import os
 from io import BytesIO
 
-openai_api_key = st.secrets.OpenAIAPI.openai_api_key
-
 # パスワードを設定
-#correct_password = st.secrets.mieai_pw.correct_password
+correct_password = st.secrets.mieai_pw.correct_password
 
 # パスワードの入力フィールドを追加
-#password = st.text_input("パスワードを入力してください", type="password")
+password = st.text_input("パスワードを入力してください", type="password")
 
 # パスワードが正しい場合の処理
-#if password == correct_password:
+if password == correct_password:
+
+    openai.api_key = st.secrets.OpenAIAPI.openai_api_key
 
 system_prompt = """
 あなたは優秀な人の悩みを解決するコーチです。
