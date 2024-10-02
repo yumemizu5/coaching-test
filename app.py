@@ -6,7 +6,7 @@ from io import BytesIO
 # gTTSでMP3を生成してBytesIOに保存する関数
 def generate_audio():
     try:
-        tts = gTTS("これはテスト音声です", lang='ja')
+        tts = gTTS("Hello", lang='ja')
         tts_file = BytesIO()
         tts.save(tts_file)
         tts_file.seek(0)  # ファイルポインタを先頭に戻す
