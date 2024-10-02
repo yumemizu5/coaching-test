@@ -3,25 +3,18 @@ import openai
 from gtts import gTTS
 from io import BytesIO
 
-# gTTSでMP3を生成してBytesIOに保存する関数
-def generate_audio():
-    try:
-        tts = gTTS("Hello", lang='ja')
-        tts_file = BytesIO()
-        tts.save(tts_file)
-        tts_file.seek(0)  # ファイルポインタを先頭に戻す
-        st.write(f"音声ファイルのサイズ: {len(tts_file.getvalue())} bytes")  # ファイルの長さを確認
-        return tts_file
-    except Exception as e:
-        st.error(f"音声生成に失敗しました: {e}")
-        return None
+import requests
 
-st.title("Streamlit TTS Test")
+st.title("インターネット接続テスト")
 
-if st.button("Generate Test Audio"):
-    audio_file = generate_audio()
-    if audio_file:
-        st.audio(audio_file, format='audio/mp3')
+try:
+    response = requests.get("https://www.google.com")
+    if response.status_code == 200:
+        st.success("インターネットに接続されています。")
+    else:
+        st.error("インターネット接続に問題があります。")
+except Exception as e:
+    st.error(f"接続エラー: {e}")
 
 
 # # パスワードを設定
