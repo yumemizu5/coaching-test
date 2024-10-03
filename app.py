@@ -2,6 +2,7 @@ import streamlit as st
 import openai
 from gtts import gTTS
 from io import BytesIO
+import base64
 
 # パスワードを設定
 correct_password = st.secrets.mieai_pw.correct_password
@@ -52,11 +53,20 @@ if password == correct_password:
         # ボットの応答メッセージを音声に変換
         tts = gTTS(bot_message["content"], lang='ja')  # 日本語対応
         tts_file = BytesIO()
-        tts.write_to_fp(tts_file)  # ここを修正
+        tts.write_to_fp(tts_file)
         tts_file.seek(0)
 
-        # 音声再生（フォーマットを指定）
-        st.audio(tts_file, format='audio/mp3')
+        # 音声データをbase64にエンコード
+        audio_bytes = tts_file.read()
+        audio_base64 = base64.b64encode(audio_bytes).decode()
+
+        # カスタムHTMLを使用して自動再生
+        audio_html = f"""
+            <audio autoplay>
+                <source src="data:audio/mp3;base64,{audio_base64}" type="audio/mp3">
+            </audio>
+        """
+        st.components.v1.html(audio_html, height=0)
 
         # チャット履歴を表示
         for message in reversed(messages[1:]):  # 直近のメッセージを上に
