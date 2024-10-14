@@ -3,6 +3,7 @@ import openai
 from gtts import gTTS
 from io import BytesIO
 import base64
+import speech_recognition as sr
 
 # パスワードを設定
 correct_password = st.secrets.mieai_pw.correct_password
@@ -75,11 +76,32 @@ if password == correct_password:
                 speaker = "🤖"
 
             st.write(speaker + ": " + message["content"])
+        
+    # 音声入力を処理する関数
+    def recognize_speech():
+        recognizer = sr.Recognizer()
+        mic = sr.Microphone()
+    
+        with mic as source:
+            st.write("音声入力中... 何か話してください。")
+            recognizer.adjust_for_ambient_noise(source)
+            audio = recognizer.listen(source)
+    
+        try:
+            st.session_state["user_input"] = recognizer.recognize_google(audio, language="ja-JP")
+            st.write(f"音声入力: {st.session_state['user_input']}")
+            communicate()  # 音声入力後にチャットを実行
+        except sr.UnknownValueError:
+            st.write("音声を認識できませんでした。もう一度お試しください。")
+        except sr.RequestError:
+            st.write("音声認識サービスにアクセスできませんでした。")
 
     # ユーザーインターフェイスの構築
     st.title("「みえAi」コーチングボット")
     st.image("mieai.png")
     st.write("悩み事は何ですか？")
+
+    st.button("音声入力開始", on_click=recognize_speech)
 
     user_input = st.text_input("悩み事を下に入力してください。", key="user_input", on_change=communicate)
 
