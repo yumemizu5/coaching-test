@@ -122,7 +122,6 @@ if password == correct_password:
         key="speech-to-text",
         mode=WebRtcMode.SENDRECV,
         audio_processor_factory=AudioProcessor,
-        media_stream_constraints={"audio": True},
         async_processing=True,
         # 録音時間を調整するための設定を追加
         rtc_configuration={
