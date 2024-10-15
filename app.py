@@ -42,24 +42,31 @@ if password == correct_password:
             self.audio_data = None
     
         def recv(self, frame):
+            # フレームを受け取るたびに音声データを蓄積
             audio_frame = frame.to_ndarray()
-            self.audio_data = np.frombuffer(audio_frame, np.float32)
+            if self.audio_data is None:
+                self.audio_data = np.frombuffer(audio_frame, np.float32)
+            else:
+                self.audio_data = np.concatenate((self.audio_data, np.frombuffer(audio_frame, np.float32)))
             return frame
     
         def process_audio(self):
-            if self.audio_data is not None:
-                # Convert audio data to speech
+            # 十分な長さの音声データがたまったら処理する（例: 5秒間）
+            if self.audio_data is not None and len(self.audio_data) > 16000 * 5:  # 5秒分の音声データ
+                # 音声データをバイト形式に変換して処理
                 audio_data_bytes = np.int16(self.audio_data).tobytes()
                 audio = sr.AudioData(audio_data_bytes, 16000, 2)
     
                 try:
-                    # Recognize speech using Google Web Speech API
+                    # GoogleのWeb Speech APIで音声をテキストに変換
                     text = self.recognizer.recognize_google(audio, language="ja-JP")
                     st.session_state["user_input"] = text
+                    self.audio_data = None  # 処理後、データをリセット
                 except sr.UnknownValueError:
                     st.write("音声を認識できませんでした。")
                 except sr.RequestError as e:
                     st.write(f"音声認識サービスにエラーが発生しました: {e}")
+
 
     # チャットボットとやりとりする関数
     def communicate():
