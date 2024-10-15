@@ -118,23 +118,23 @@ if password == correct_password:
 
     # 音声入力のためのUI
     st.write("音声入力を有効にするには下のボタンを押してください。")
-        webrtc_ctx = webrtc_streamer(
-            key="speech-to-text",
-            mode=WebRtcMode.SENDRECV,
-            audio_processor_factory=AudioProcessor,
-            media_stream_constraints={"audio": True},
-            async_processing=True,
-            # 録音時間を調整するための設定を追加
-            rtc_configuration={
-                "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
-            },
-            media_stream_constraints={
-                "audio": {
-                    "sampleRate": 16000,  # サンプリングレートを指定（16kHz）
-                    "channelCount": 1     # モノラル音声に設定
-                }
+    webrtc_ctx = webrtc_streamer(
+        key="speech-to-text",
+        mode=WebRtcMode.SENDRECV,
+        audio_processor_factory=AudioProcessor,
+        media_stream_constraints={"audio": True},
+        async_processing=True,
+        # 録音時間を調整するための設定を追加
+        rtc_configuration={
+            "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
+        },
+        media_stream_constraints={
+            "audio": {
+                "sampleRate": 16000,  # サンプリングレートを指定（16kHz）
+                "channelCount": 1     # モノラル音声に設定
             }
-        )
+        }
+    )
 
     
     if webrtc_ctx.state.playing:
