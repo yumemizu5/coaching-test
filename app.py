@@ -3,6 +3,8 @@ import openai
 from gtts import gTTS
 from io import BytesIO
 import base64
+from streamlit_webrtc import webrtc_streamer, AudioProcessorBase, WebRtcMode
+import numpy as np
 import speech_recognition as sr
 
 # パスワードを設定
@@ -33,6 +35,31 @@ if password == correct_password:
         st.session_state["messages"] = [
             {"role": "system", "content": system_prompt}
         ]
+
+    class AudioProcessor(AudioProcessorBase):
+    def __init__(self):
+        self.recognizer = sr.Recognizer()
+        self.audio_data = None
+
+    def recv(self, frame):
+        audio_frame = frame.to_ndarray()
+        self.audio_data = np.frombuffer(audio_frame, np.float32)
+        return frame
+
+    def process_audio(self):
+        if self.audio_data is not None:
+            # Convert audio data to speech
+            audio_data_bytes = np.int16(self.audio_data).tobytes()
+            audio = sr.AudioData(audio_data_bytes, 16000, 2)
+
+            try:
+                # Recognize speech using Google Web Speech API
+                text = self.recognizer.recognize_google(audio, language="ja-JP")
+                st.session_state["user_input"] = text
+            except sr.UnknownValueError:
+                st.write("音声を認識できませんでした。")
+            except sr.RequestError as e:
+                st.write(f"音声認識サービスにエラーが発生しました: {e}")
 
     # チャットボットとやりとりする関数
     def communicate():
@@ -82,31 +109,21 @@ if password == correct_password:
     st.image("mieai.png")
     st.write("悩み事は何ですか？")
 
-     # 音声入力用のJavaScriptを追加
-    st.components.v1.html(
-        """
-        <script>
-        const recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
-        recognition.lang = 'ja-JP';
-        recognition.continuous = false;
-
-        function startRecognition() {
-            recognition.start();
-        }
-
-        recognition.onresult = function(event) {
-            const transcript = event.results[0][0].transcript;
-            console.log("音声入力: " + transcript);
-            const streamlitInput = document.getElementById("user_input");
-            streamlitInput.value = transcript;
-            streamlitInput.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-        </script>
-        <button onclick="startRecognition()">音声入力開始</button>
-        <input type="text" id="user_input" style="display:none;">
-        """,
-        height=100,
+    # 音声入力のためのUI
+    st.write("音声入力を有効にするには下のボタンを押してください。")
+    webrtc_ctx = webrtc_streamer(
+        key="speech-to-text",
+        mode=WebRtcMode.SENDRECV,
+        audio_processor_factory=AudioProcessor,
+        media_stream_constraints={"audio": True},
+        async_processing=True,
     )
+    
+    if webrtc_ctx.state.playing:
+        audio_processor = webrtc_ctx.audio_processor
+        if audio_processor:
+            audio_processor.process_audio()
+
 
     user_input = st.text_input("悩み事を下に入力してください。", key="user_input", on_change=communicate)
 
