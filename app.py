@@ -124,7 +124,18 @@ if password == correct_password:
         audio_processor_factory=AudioProcessor,
         media_stream_constraints={"audio": True},
         async_processing=True,
+        # 録音時間を調整するための設定を追加
+        rtc_configuration={
+            "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
+        },
+        media_stream_constraints={
+            "audio": {
+                "sampleRate": 16000,  # サンプリングレートを指定（16kHz）
+                "channelCount": 1     # モノラル音声に設定
+            }
+        }
     )
+
     
     if webrtc_ctx.state.playing:
         audio_processor = webrtc_ctx.audio_processor
