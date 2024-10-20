@@ -122,15 +122,14 @@ if password == correct_password:
         key="speech-to-text",
         mode=WebRtcMode.SENDRECV,
         audio_processor_factory=AudioProcessor,
-        async_processing=True,
-        # 録音時間を調整するための設定を追加
+        async_processing=False,  # 非同期処理を無効化
         rtc_configuration={
             "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
         },
         media_stream_constraints={
             "audio": {
-                "sampleRate": 16000,  # サンプリングレートを指定（16kHz）
-                "channelCount": 1     # モノラル音声に設定
+                "sampleRate": 16000,  
+                "channelCount": 1     
             }
         }
     )
