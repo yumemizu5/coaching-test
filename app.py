@@ -6,6 +6,7 @@ import base64
 from streamlit_webrtc import webrtc_streamer, AudioProcessorBase, WebRtcMode
 import numpy as np
 import speech_recognition as sr
+import av
 
 # パスワードを設定
 correct_password = st.secrets.mieai_pw.correct_password
@@ -36,37 +37,38 @@ if password == correct_password:
             {"role": "system", "content": system_prompt}
         ]
 
-    class AudioProcessor(AudioProcessorBase):
-        def __init__(self):
-            self.recognizer = sr.Recognizer()
-            self.audio_data = None
-    
-        def recv(self, frame):
-            # フレームを受け取るたびに音声データを蓄積
-            audio_frame = frame.to_ndarray()
-            if self.audio_data is None:
-                self.audio_data = np.frombuffer(audio_frame, np.float32)
-            else:
-                self.audio_data = np.concatenate((self.audio_data, np.frombuffer(audio_frame, np.float32)))
-            return frame
-    
-        def process_audio(self):
-            # 十分な長さの音声データがたまったら処理する（例: 5秒間）
-            if self.audio_data is not None and len(self.audio_data) > 16000 * 5:
-                audio_data_bytes = np.int16(self.audio_data * 32767).tobytes()  # float32からint16に変換
-                audio = sr.AudioData(audio_data_bytes, 16000, 1)  # サンプルレートとチャンネル数を設定
+    # 音声データを蓄積するバッファを初期化
+    if 'audio_buffer' not in st.session_state:
+        st.session_state['audio_buffer'] = []
 
-    
+    class AudioProcessor(AudioProcessorBase):
+        def __init__(self) -> None:
+            super().__init__()
+            self.recognizer = sr.Recognizer()
+
+        def recv(self, frame: av.AudioFrame) -> av.AudioFrame:
+            audio = frame.to_ndarray().flatten()
+            st.session_state['audio_buffer'].extend(audio.tolist())
+
+            # 5秒分の音声データがたまったら処理する
+            if len(st.session_state['audio_buffer']) >= 16000 * 5:
+                audio_data = np.array(st.session_state['audio_buffer'], dtype=np.float32)
+                audio_data_int16 = np.int16(audio_data * 32767).tobytes()
+                audio_sr = sr.AudioData(audio_data_int16, 16000, 2)
+
                 try:
-                    # GoogleのWeb Speech APIで音声をテキストに変換
-                    text = self.recognizer.recognize_google(audio, language="ja-JP")
+                    text = self.recognizer.recognize_google(audio_sr, language="ja-JP")
                     st.session_state["user_input"] = text
-                    self.audio_data = None  # 処理後、データをリセット
+                    communicate()
+                    st.session_state['audio_buffer'] = []  # バッファをリセット
                 except sr.UnknownValueError:
                     st.write("音声を認識できませんでした。")
+                    st.session_state['audio_buffer'] = []
                 except sr.RequestError as e:
                     st.write(f"音声認識サービスにエラーが発生しました: {e}")
+                    st.session_state['audio_buffer'] = []
 
+            return frame  # フレームをそのまま返す
 
     # チャットボットとやりとりする関数
     def communicate():
@@ -110,26 +112,20 @@ if password == correct_password:
                 speaker = "🤖"
 
             st.write(speaker + ": " + message["content"])
-        
+
     # ユーザーインターフェイスの構築
     st.title("「みえAi」コーチングボット")
     st.image("mieai.png")
     st.write("悩み事は何ですか？")
-
-
-    user_input = st.text_input("悩み事を下に入力してください。", key="user_input", on_change=communicate)
 
     # WebRTCストリーミングを開始
     webrtc_ctx = webrtc_streamer(
         key="example",
         mode=WebRtcMode.SENDONLY,
         audio_processor_factory=AudioProcessor,
-        media_stream_constraints={"audio": True}
+        media_stream_constraints={"audio": True, "video": False},
+        async_processing=True,
     )
-
-    # 音声入力が利用可能かチェック
-    if webrtc_ctx.audio_processor:
-        webrtc_ctx.audio_processor.process_audio()
 
 else:
     # パスワードが間違っている場合のメッセージを表示
