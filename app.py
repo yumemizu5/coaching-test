@@ -116,30 +116,6 @@ if password == correct_password:
     st.image("mieai.png")
     st.write("悩み事は何ですか？")
 
-    # 音声入力のためのUI
-    st.write("音声入力を有効にするには下のボタンを押してください。")
-    webrtc_ctx = webrtc_streamer(
-        key="speech-to-text",
-        mode=WebRtcMode.SENDRECV,
-        audio_processor_factory=AudioProcessor,
-        async_processing=False,  # 非同期処理を無効化
-        rtc_configuration={
-            "iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]
-        },
-        media_stream_constraints={
-            "audio": {
-                "sampleRate": 16000,  
-                "channelCount": 1     
-            }
-        }
-    )
-
-    
-    if webrtc_ctx.state.playing:
-        audio_processor = webrtc_ctx.audio_processor
-        if audio_processor:
-            audio_processor.process_audio()
-
 
     user_input = st.text_input("悩み事を下に入力してください。", key="user_input", on_change=communicate)
 
