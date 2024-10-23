@@ -52,10 +52,10 @@ if password == correct_password:
     
         def process_audio(self):
             # 十分な長さの音声データがたまったら処理する（例: 5秒間）
-            if self.audio_data is not None and len(self.audio_data) > 16000 * 5:  # 5秒分の音声データ
-                # 音声データをバイト形式に変換して処理
-                audio_data_bytes = np.int16(self.audio_data).tobytes()
-                audio = sr.AudioData(audio_data_bytes, 16000, 2)
+            if self.audio_data is not None and len(self.audio_data) > 16000 * 5:
+                audio_data_bytes = np.int16(self.audio_data * 32767).tobytes()  # float32からint16に変換
+                audio = sr.AudioData(audio_data_bytes, 16000, 1)  # サンプルレートとチャンネル数を設定
+
     
                 try:
                     # GoogleのWeb Speech APIで音声をテキストに変換
