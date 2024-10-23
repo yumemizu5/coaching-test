@@ -76,7 +76,7 @@ if password == correct_password:
         messages.append(user_message)
 
         response = openai.ChatCompletion.create(
-            model="gpt-4o",
+            model="gpt-4",
             messages=messages
         )
 
@@ -118,6 +118,18 @@ if password == correct_password:
 
 
     user_input = st.text_input("悩み事を下に入力してください。", key="user_input", on_change=communicate)
+
+    # WebRTCストリーミングを開始
+    webrtc_ctx = webrtc_streamer(
+        key="example",
+        mode=WebRtcMode.SENDONLY,
+        audio_processor_factory=AudioProcessor,
+        media_stream_constraints={"audio": True}
+    )
+
+    # 音声入力が利用可能かチェック
+    if webrtc_ctx.audio_processor:
+        webrtc_ctx.audio_processor.process_audio()
 
 else:
     # パスワードが間違っている場合のメッセージを表示
