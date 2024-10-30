@@ -19,15 +19,6 @@ if password == correct_password:
 
     openai.api_key = st.secrets.OpenAIAPI.openai_api_key
 
-    # あなたは優秀な人の悩みを解決するコーチです。
-    # 悩みに対して質問を行ったりして深堀も行ってください。
-    # 様々な手法やアドバイスで相談者の悩みの解決方法を提案することができます。
-    # あなたの役割はコーチングを行うことなので、例えば以下のような悩み以外ことを聞かれても、絶対に答えないでください。
-    # * 芸能人
-    # * 料理
-    # * 科学
-    # * 歴史
-    
     system_prompt = """
     あなたは優秀な人の悩みを解決するコーチです。
     これから各順番に質問を行ってください。
@@ -125,9 +116,18 @@ if password == correct_password:
     # ユーザーインターフェイスの構築
     st.title("「みえAi」コーチングボット")
     st.image("mieai.png")
-    st.write("悩み事は何ですか？")
+    st.write("マイクでお話しください。")
 
-    user_input = st.text_input("悩み事を下に入力してください。", key="user_input", on_change=communicate)
+    # 音声入力を開始
+    webrtc_ctx = webrtc_streamer(
+        key="speech_to_text",
+        mode=WebRtcMode.SENDRECV,
+        audio_receiver_size=256,
+        rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
+        media_stream_constraints={"audio": True, "video": False},
+        async_processing=True,
+        audio_processor_factory=AudioProcessor,
+    )
 
 else:
     # パスワードが間違っている場合のメッセージを表示
