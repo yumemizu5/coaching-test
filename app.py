@@ -127,6 +127,8 @@ if password == correct_password:
     st.image("mieai.png")
     st.write("悩み事は何ですか？")
 
+    user_input = st.text_input("悩み事を下に入力してください。", key="user_input", on_change=communicate)
+
     # WebRTCストリーミングを開始
     webrtc_ctx = webrtc_streamer(
         key="example",
