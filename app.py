@@ -129,15 +129,6 @@ if password == correct_password:
 
     user_input = st.text_input("悩み事を下に入力してください。", key="user_input", on_change=communicate)
 
-    # WebRTCストリーミングを開始
-    webrtc_ctx = webrtc_streamer(
-        key="example",
-        mode=WebRtcMode.SENDONLY,
-        audio_processor_factory=AudioProcessor,
-        media_stream_constraints={"audio": True, "video": False},
-        async_processing=True,
-    )
-
 else:
     # パスワードが間違っている場合のメッセージを表示
     st.write("パスワードが正しくありません。アプリにアクセスするために正しいパスワードを入力してください。")
