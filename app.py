@@ -32,6 +32,17 @@ if password == correct_password:
 
     """
 
+    class AudioProcessor(AudioProcessorBase):
+    def __init__(self) -> None:
+        super().__init__()
+        st.write("AudioProcessor initialized")
+
+    def recv(self, frame: av.AudioFrame) -> av.AudioFrame:
+        st.write("Received audio frame")
+        audio = frame.to_ndarray().flatten()
+        st.write(f"Audio frame length: {len(audio)}")
+
+    
     # st.session_stateを使いメッセージのやりとりを保存
     if "messages" not in st.session_state:
         st.session_state["messages"] = [
