@@ -64,6 +64,8 @@ if password == correct_password:
                     text = self.recognizer.recognize_google(audio_sr, language="ja-JP")
                     st.session_state["user_input"] = text
                     st.session_state['audio_buffer'] = []  # バッファをリセット
+                    # 認識されたテキストを表示
+                    st.write(f"**あなた:** {text}")
                     communicate()
                 except sr.UnknownValueError:
                     st.write("音声を認識できませんでした。もう一度お話しください。")
