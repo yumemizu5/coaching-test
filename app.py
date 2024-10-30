@@ -31,17 +31,6 @@ if password == correct_password:
     4.好きな動物は犬ですか？猫ですか？
 
     """
-
-    class AudioProcessor(AudioProcessorBase):
-    def __init__(self) -> None:
-        super().__init__()
-        st.write("AudioProcessor initialized")
-
-    def recv(self, frame: av.AudioFrame) -> av.AudioFrame:
-        st.write("Received audio frame")
-        audio = frame.to_ndarray().flatten()
-        st.write(f"Audio frame length: {len(audio)}")
-
     
     # st.session_stateを使いメッセージのやりとりを保存
     if "messages" not in st.session_state:
@@ -61,12 +50,20 @@ if password == correct_password:
         def __init__(self) -> None:
             super().__init__()
             st.write("AudioProcessor initialized")
-
+    
         def recv(self, frame: av.AudioFrame) -> av.AudioFrame:
             st.write("Received audio frame")
             audio = frame.to_ndarray().flatten()
-            st.session_state['audio_buffer'].extend(audio.tolist())
-            st.write(f"Audio buffer length: {len(st.session_state['audio_buffer'])}")
+            st.write(f"Audio frame length: {len(audio)}")
+        # def __init__(self) -> None:
+        #     super().__init__()
+        #     st.write("AudioProcessor initialized")
+
+        # def recv(self, frame: av.AudioFrame) -> av.AudioFrame:
+        #     st.write("Received audio frame")
+        #     audio = frame.to_ndarray().flatten()
+        #     st.session_state['audio_buffer'].extend(audio.tolist())
+        #     st.write(f"Audio buffer length: {len(st.session_state['audio_buffer'])}")
 
             # 3秒分の音声データがたまったら処理する
             if len(st.session_state['audio_buffer']) >= 16000 * 3:
