@@ -3,3 +3,4 @@ openai==0.28.1
 gtts
 SpeechRecognition
 streamlit_webrtc==0.47.9
+scipy
