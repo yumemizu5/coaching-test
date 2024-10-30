@@ -5,8 +5,9 @@ from io import BytesIO
 import base64
 from streamlit_webrtc import webrtc_streamer, AudioProcessorBase, WebRtcMode
 import numpy as np
-import speech_recognition as sr
 import av
+import tempfile
+from scipy.io.wavfile import write
 
 # パスワードを設定
 correct_password = st.secrets.mieai_pw.correct_password
@@ -48,31 +49,34 @@ if password == correct_password:
     class AudioProcessor(AudioProcessorBase):
         def __init__(self) -> None:
             super().__init__()
-            self.recognizer = sr.Recognizer()
+            st.write("AudioProcessor initialized")
 
         def recv(self, frame: av.AudioFrame) -> av.AudioFrame:
+            st.write("Received audio frame")
             audio = frame.to_ndarray().flatten()
             st.session_state['audio_buffer'].extend(audio.tolist())
+            st.write(f"Audio buffer length: {len(st.session_state['audio_buffer'])}")
 
             # 3秒分の音声データがたまったら処理する
             if len(st.session_state['audio_buffer']) >= 16000 * 3:
                 audio_data = np.array(st.session_state['audio_buffer'], dtype=np.float32)
-                audio_data_int16 = np.int16(audio_data * 32767).tobytes()
-                audio_sr = sr.AudioData(audio_data_int16, 16000, 2)
+                st.session_state['audio_buffer'] = []  # バッファをリセット
 
-                try:
-                    text = self.recognizer.recognize_google(audio_sr, language="ja-JP")
-                    st.session_state["user_input"] = text
-                    st.session_state['audio_buffer'] = []  # バッファをリセット
-                    # 認識されたテキストを表示
-                    st.write(f"**あなた:** {text}")
-                    communicate()
-                except sr.UnknownValueError:
-                    st.write("音声を認識できませんでした。もう一度お話しください。")
-                    st.session_state['audio_buffer'] = []
-                except sr.RequestError as e:
-                    st.write(f"音声認識サービスにエラーが発生しました: {e}")
-                    st.session_state['audio_buffer'] = []
+                # 一時ファイルに音声データを保存
+                with tempfile.NamedTemporaryFile(suffix=".wav") as tmp_file:
+                    write(tmp_file.name, 16000, audio_data)
+                    tmp_file.flush()
+
+                    # Whisper API を使用して音声認識
+                    audio_file = open(tmp_file.name, "rb")
+                    try:
+                        transcript = openai.Audio.transcribe("whisper-1", audio_file, language="ja")
+                        text = transcript["text"]
+                        st.session_state["user_input"] = text
+                        st.write(f"認識されたテキスト: {text}")
+                        communicate()
+                    except Exception as e:
+                        st.write(f"音声認識中にエラーが発生しました: {e}")
 
             return frame  # フレームをそのまま返す
 
@@ -134,7 +138,7 @@ if password == correct_password:
         audio_receiver_size=256,
         rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
         media_stream_constraints={"audio": True, "video": False},
-        async_processing=True,
+        async_processing=False,  # 非同期処理を無効化
         audio_processor_factory=AudioProcessor,
     )
 
