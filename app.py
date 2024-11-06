@@ -8,6 +8,8 @@ import numpy as np
 import av
 import tempfile
 from scipy.io.wavfile import write
+from audio_recorder_streamlit import audio_recorder
+from tempfile import NamedTemporaryFile
 
 # パスワードを設定
 correct_password = st.secrets.mieai_pw.correct_password
