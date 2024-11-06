@@ -4,3 +4,4 @@ gtts
 SpeechRecognition
 streamlit_webrtc==0.47.9
 scipy
+udio-recorder-streamlit
