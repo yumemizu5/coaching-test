@@ -165,6 +165,12 @@ if password == correct_password:
         transcript = transcribe_audio_to_text(audio_bytes)
         st.write("Transcribed Text:", transcript)
 
+        # 変換されたテキストをセッションステートに保存
+        st.session_state["user_input"] = transcript
+        
+        # チャットボットとやりとり
+        communicate()
+
     
     # 初回のボットメッセージを表示
     if "init" not in st.session_state:
