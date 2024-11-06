@@ -94,7 +94,7 @@ if password == correct_password:
 
     
     def transcribe_audio_to_text(audio_bytes):
-        openai.api_key = st.secrets.OpenAIAPI.openai_api_key
+        #openai.api_key = st.secrets.OpenAIAPI.openai_api_key
         with NamedTemporaryFile(delete=True, suffix=".wav") as temp_file:
             temp_file.write(audio_bytes)
             temp_file.flush()
