@@ -88,6 +88,22 @@ if password == correct_password:
 
             return frame  # フレームをそのまま返す
 
+
+
+    
+    def transcribe_audio_to_text(audio_bytes):
+    openai.api_key = st.secrets.OpenAIAPI.openai_api_key
+    with NamedTemporaryFile(delete=True, suffix=".wav") as temp_file:
+        temp_file.write(audio_bytes)
+        temp_file.flush()
+        with open(temp_file.name, "rb") as audio_file:
+            response = openai.Audio.transcribe("whisper-1", audio_file)
+    return response["text"]
+
+
+
+    
+
     # チャットボットとやりとりする関数
     def communicate():
         messages = st.session_state["messages"]
@@ -139,17 +155,15 @@ if password == correct_password:
     st.image("mieai.png")
     st.write("マイクでお話しください。")
 
-    # 音声入力を開始
-    webrtc_ctx = webrtc_streamer(
-        key="speech_to_text",
-        mode=WebRtcMode.SENDRECV,
-        audio_receiver_size=256,
-        rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
-        media_stream_constraints={"audio": True, "video": False},
-        async_processing=False,  # 非同期処理を無効化
-        audio_processor_factory=AudioProcessor,
-    )
+    # Record audio using Streamlit widget
+    audio_bytes = audio_recorder(pause_threshold=30)
+    
+    # Convert audio to text using OpenAI Whisper API
+    if audio_bytes:
+        transcript = transcribe_audio_to_text(audio_bytes)
+        st.write("Transcribed Text:", transcript)
 
+    
     # 初回のボットメッセージを表示
     if "init" not in st.session_state:
         communicate()
