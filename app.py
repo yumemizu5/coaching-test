@@ -99,7 +99,7 @@ if password == correct_password:
             temp_file.write(audio_bytes)
             temp_file.flush()
             with open(temp_file.name, "rb") as audio_file:
-                response = openai.Audio.transcribe("whisper-1", audio_file, language="ja")
+                response = openai.Audio.transcribe("whisper-1", audio_file, language="ja", temperature=0.5)
         return response["text"]
 
 
