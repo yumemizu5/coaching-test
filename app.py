@@ -180,3 +180,24 @@ if password == correct_password:
 else:
     # パスワードが間違っている場合のメッセージを表示
     st.write("パスワードが正しくありません。アプリにアクセスするために正しいパスワードを入力してください。")
+
+
+# 回答を保存するリストを初期化
+if 'answers' not in st.session_state:
+    st.session_state['answers'] = [""] * 9  # 9マス分のスペースを確保
+
+# チャットボットとやりとりする関数
+def communicate():
+    # ...（省略）...
+
+    # 回答をリストに追加
+    for i, message in enumerate(messages):
+        if message["role"] == "user" and i < 9:
+            st.session_state['answers'][i] = message["content"]
+
+# 9マスに回答を表示
+st.write("### 回答一覧")
+cols = st.columns(3)
+for i, answer in enumerate(st.session_state['answers']):
+    with cols[i % 3]:
+        st.write(answer)
